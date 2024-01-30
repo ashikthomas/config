@@ -1,0 +1,59 @@
+term xterm-256color
+# tell screen how to set 256 colors. AB = background, AF=foreground
+# source: https://gist.github.com/ChrisWills/1337178
+# is probably not required at all as long as your termcap/terminfo has either
+# 'xterm-256color' or 'screen-256color' entries; test w/ 'infocmp <termtype>'
+# termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+# enables use of shift-PgUp and shift-PgDn (couldn't get this to do anything
+# useful; use Ctrl+A, Esc to activate scrollback, PgUp/PgDn work as expected
+# termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# allow bold colors - doesn't seem to be necessary; run the command
+# 'python -m fabulous.demo' from https://github.com/jart/fabulous for a test
+#attrcolor b ".I"
+
+# erase background with current bg color; otherwise Vim themes (and probably
+# other programs that make use of background colors) will look weird
+#defbce "on"
+
+defscrollback 30000
+startup_message off
+msgwait 1
+
+# it's up to the client where to display the "hardstatus"; unless otherwise
+# specified, it may be capable of putting it in the title bar of the window.
+# comment this out if that's what you want.
+hardstatus alwayslastline
+
+# a simple status line; '%h' means the existing 'hardstatus' of the window,
+# which may be the same as what's already in your terminal's titlebar
+# all the remaining "string escapes" are documented here:
+# https://www.gnu.org/software/screen/manual/html_node/String-Escapes.html
+#hardstatus string "%3n %t%? @%u%?%? [%h]%?%=%D %M %d %c"
+
+# a fancier status line, gives window list, login name and current date:
+# source: elementaryOS / Ubuntu default?
+hardstatus string "%{wk}%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{wk}%?%+Lw %=%{mk}@%H %{yk}%D %{ck}%M%{wk} %{ck}%d %{gk}%c"
+
+# create an external command which can be used as part of the status line and
+# store it in "slot" #101
+# source: https://www.gnu.org/software/screen/manual/html_node/Backtick.html
+backtick 101 30 15 $HOME/bin/bjob_status.sh
+
+# another one; with LSF job status that is displayed conditionally based on the
+# output of the ~/bin/bjob_status.sh script
+# source: https://gist.github.com/ChrisWills/1337178
+hardstatus string '%{= Kd} %{= Kd}%-w%{= Kr}[%{= KW}%n %t%{= Kr}]%{= Kd}%+w %-= %{KG} %H%{KW} | %?%{KY}LSF: %101`%{KW} | %?%D %M %d %Y%{= Kc} %C%A%{-}'
+
+# bind some keys to make it easier to resize / make splits equal size
+# source: elementaryOS / Ubuntu default?
+bind = resize =
+bind + resize +1
+bind - resize -1
+bind _ resize max
+
+# bind Ctrl+A, backtick to window #0
+# source: https://lists.gnu.org/archive/html/screen-users/2009-01/msg00084.html
+bind ` select 0 
+bind 0 select 10
